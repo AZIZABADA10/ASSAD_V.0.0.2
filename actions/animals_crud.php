@@ -1,6 +1,7 @@
 <?php
 
-    require_once '../config/db.php';
+    use App\Config\DataBase;
+    $connexion = DataBase::getInstance()->getDataBase();
 
 
 if (isset($_POST['ajouter_animal'])) {

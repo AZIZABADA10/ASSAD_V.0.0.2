@@ -1,13 +1,12 @@
 <?php
-
 session_start();
+use App\Config\DataBase;
+$connexion = DataBase::getInstance()->getDataBase();
 
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header('Location: ../pages/public/login.php');
     exit();
 }
-
-require_once __DIR__ .'/../config/db.php';
 
 
 

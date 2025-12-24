@@ -1,7 +1,7 @@
 <?php
-    require_once __DIR__ .'/../config/db.php';
-
 session_start();
+use App\Config\DataBase;
+$connexion = DataBase::getInstance()->getDataBase();
 
 if (!isset($_SESSION['user'])) {
     header('Location: ../pages/admin/manage_habitats.php');

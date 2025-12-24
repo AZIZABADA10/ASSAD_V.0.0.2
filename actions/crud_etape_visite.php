@@ -1,6 +1,7 @@
 <?php
 session_start();
-require_once '../config/db.php';
+    use App\Config\DataBase;
+    $connexion = DataBase::getInstance()->getDataBase();
 
 if (isset($_POST['ajouter_etape'])) {
     $id_visite = (int)$_POST['id_visite'];

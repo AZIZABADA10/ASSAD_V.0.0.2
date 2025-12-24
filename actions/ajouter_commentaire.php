@@ -1,6 +1,8 @@
 <?php
 session_start();
-use App\Database;
+
+use App\Config\DataBase;
+
 $connexion = Database::getInstance()->getBaseDonne();
 
 

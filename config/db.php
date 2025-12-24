@@ -1,47 +1,38 @@
 <?php
+namespace App\Config\DataBase;
 
-namespace App\Database;
 use PDO;
 use PDOException;
 
-// $serveur='localhost';
-// $utilisateur='adminAssad';
-// $nom_base_de_donnee = 'assad';
-// $mot_de_passe = 'Assad@286';
+class DataBase
+{
+    private static ?DataBase $instance = null;
 
-// $connexion = new mysqli($serveur,$utilisateur,$mot_de_passe,$nom_base_de_donnee);
-// if ($connexion -> connect_error) {
-//     die("Erreur de connexion:". $connexion -> connect_error);
-// }
-
-
-class BaseDonne
- {
-    private static ?BaseDonne $instance = null;
+    /**interface d'abstraction du base de donnée  */
     private PDO $connexion;
 
+
     private $dsn = "mysql:host=localhost;dbname=assad";
-    private $utilisateur='adminAssad';
-    private $mot_de_passe = 'Assad@286';
+    private $user = "adminAssad";
+    private $pws = 'Assad@286';
 
 
     private function __construct(){
         try {
-            $this-> connexion = new PDO(
+            $this->connexion = new PDO(
                 $this->dsn,
-                $this->utilisateur,
-                $this->mot_de_passe
+                $this->user,
+                $this->pws
             );
         } catch (PDOException $e) {
-            die("Erreur de connexion:" .$e->getMessage());
+            die("Erreur de connexion: ".$e->getMessage());
         }
     }
 
-    public static function getInstance(){
+    public static function getInstance (){
         if (self::$instance == null) {
-            self::$instance = new BaseDonne();
+            self::$instance = new DataBase();
         }
-
         return self::$instance;
     }
 
@@ -49,8 +40,4 @@ class BaseDonne
     public function getBaseDonne(){
         return $this-> connexion;
     }
-    
 }
-
-
-?>

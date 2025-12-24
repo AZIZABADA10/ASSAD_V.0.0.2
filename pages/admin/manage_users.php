@@ -1,7 +1,8 @@
 <?php
 session_start();
 
-require_once '../../config/db.php';
+use App\Config\DataBase;
+$connexion = DataBase::getInstance()->getDataBase();
 
 $users = $connexion->query("SELECT * FROM utilisateurs order by id_utilisateur desc");
 

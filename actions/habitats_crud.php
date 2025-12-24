@@ -1,6 +1,6 @@
 <?php
-
-    require_once __DIR__ .'/../config/db.php';
+use App\Config\DataBase;
+$connexion = DataBase::getInstance()->getDataBase();
 
 $habitats = $connexion -> query("SELECT * FROM habitats ORDER BY id_habitat DESC");
 

@@ -2,8 +2,8 @@
 
 session_start();
 
-require_once '../../config/db.php';
-
+use App\Config\DataBase;
+$connexion = DataBase::getInstance()->getDataBase();
 
 if (!isset($_SESSION['user'])) {
   header('Location: ../../pages/public/login.php');

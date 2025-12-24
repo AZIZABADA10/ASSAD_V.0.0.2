@@ -1,10 +1,9 @@
 <?php
 session_start();
-require_once '../config/db.php';
 
-/* ===========================
-   Sécurité
-=========================== */
+use App\Config\DataBase;
+$connexion = DataBase::getInstance()->getDataBase();
+
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'guide') {
     header('Location: ../pages/public/login.php');
     exit();
@@ -12,9 +11,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'guide') {
 
 $id_guide = $_SESSION['user']['id_utilisateur'];
 
-/* ===========================
-   AJOUTER UNE VISITE
-=========================== */
+
 if (isset($_POST['ajouter_visite'])) {
 
     $titre        = $_POST['titre'];
