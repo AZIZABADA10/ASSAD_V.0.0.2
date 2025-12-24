@@ -1,6 +1,7 @@
 <?php
 session_start();
-require_once '../config/db.php';
+use App\Database;
+$connexion = Database::getInstance()->getBaseDonne();
 
 
 if (isset($_POST['id_visite'], $_POST['note'], $_POST['texte'])) {
