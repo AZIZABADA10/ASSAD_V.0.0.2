@@ -1,102 +1,79 @@
 <?php
+namespace App\Classes;
 
-class Commentaire
+use PDO;
+
+class EtapeVisite
 {
-    private int $idVisiteGuidee;
-    private int $idUtilisateur;
-    private int $note;
-    private string $texte;
-    private string $date_commentaire;
 
+    private string $titreEtape;
+    private string $descriptionEtape;
+    private int $ordreEtape;
+    private int $idVisite;
 
-    public function __construct(int $idVisiteGuidee,int $idUtilisateur,int $note,string $texte,string $date_commentaire)
-    {
-        $this->idVisiteGuidee= $idVisiteGuidee;
-        $this->idUtilisateur= $idUtilisateur;
-        $this->note = $note;
-        $this->texte = $texte;
-        $this->date_commentaire = $date_commentaire;
+    
+    public function __construct(string $titreEtape,string $descriptionEtape,int $ordreEtape,int $idVisite) {
+
+        $this->titreEtape = $titreEtape;
+        $this->descriptionEtape = $descriptionEtape;
+        $this->ordreEtape = $ordreEtape;
+        $this->idVisite = $idVisite;
     }
 
 
-    public function getIdCommentaire(): int
+    
+
+    public function getTitreEtape(): string
     {
-        return $this->id_commentaire;
+        return $this->titreEtape;
     }
 
-    public function getIdVisiteGuidee(): int
+    public function getDescriptionEtape(): string
     {
-        return $this->idVisiteGuidee;
+        return $this->descriptionEtape;
     }
 
-    public function getIdUtilisateur(): int
+    public function getOrdreEtape(): int
     {
-        return $this->idUtilisateur;
+        return $this->ordreEtape;
     }
 
-    public function getNote(): int
+    
+
+
+    public function setTitreEtape(string $titreEtape): void
     {
-        return $this->note;
+        $this->titreEtape = $titreEtape;
     }
 
-    public function getTexte(): string
+    public function setDescriptionEtape(string $descriptionEtape): void
     {
-        return $this->texte;
+        $this->descriptionEtape = $descriptionEtape;
     }
 
-    public function getDateCommentaire(): string
+    public function setOrdreEtape(int $ordreEtape): void
     {
-        return $this->date_commentaire;
+        $this->ordreEtape = $ordreEtape;
     }
 
-
-    public function setIdVisiteGuidee(int $idVisiteGuidee): void
+    public function setIdVisite(int $idVisite): void
     {
-        $this->idVisiteGuidee = $idVisiteGuidee;
-    }
-
-    public function setIdUtilisateur(int $idUtilisateur): void
-    {
-        $this->idUtilisateur = $idUtilisateur;
-    }
-
-    public function setNote(int $note): void
-    {
-        $this->note = $note;
-    }
-
-    public function setTexte(string $texte): void
-    {
-        $this->texte = $texte;
-    }
-
-    public function setDateCommentaire(string $date_commentaire): void
-    {
-        $this->date_commentaire = $date_commentaire;
+        $this->idVisite = $idVisite;
     }
 
 
-    public function creerCommentaire(string $com): void
+    public function create(PDO $pdo): bool
     {
-        $sql = "INSERT INTO commentaires (
-                id_visite,
-                id_utilisateur,
-                note,
-                date_commentaire,
-                texte) 
-                values (?,?,?,?,?)";
-        $pdo->prepare($sql)->execute([
-            $this->idVisiteGuidee,
-            $this->idUtilisateur,
-            $this->note,
-            $this->texte ,
-            $this->date_commentaire 
+        $sql = "INSERT INTO etapes_visite
+                (titre_etape, description_etape, ordre_etape, id_visite)
+                VALUES (?, ?, ?, ?)";
+
+        $stmt = $pdo->prepare($sql);
+        return $stmt->execute([
+            $this->titreEtape,
+            $this->descriptionEtape,
+            $this->ordreEtape,
+            $this->idVisite
         ]);
-    }
-    public function getAllCommentaire()
-    {
-        $sql ="SELECT * FROM  commentaires";
-        $pdo->prepare($sql)->fetchAll();
-
     }
 }

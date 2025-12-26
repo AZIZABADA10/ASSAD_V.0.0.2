@@ -1,5 +1,5 @@
 <?php
-namespace App\Models;
+namespace App\Classes;
 
 use PDO;
 
@@ -160,7 +160,7 @@ public function getDuree(): int
         $pdo->prepare($sql)->execute([$neveauStatut,$id]);
     }
 
-    public function affichierVisite () 
+    public function affichierVisite (): mixed
     {
         return $this->titre.' '.$this->description.' '.$this->date_heure.' '.$this->langue.' '.$this->capacite_max.' '.$this->statut.' '.$this->duree.' '.$this->prix.' '.$this->id_guide;
     }
