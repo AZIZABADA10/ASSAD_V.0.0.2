@@ -4,12 +4,13 @@ namespace App\Classes;
 
 class Guide extends Utilisateur
 {
-    public function __construct(string $nom_complet, string $email, string $mot_de_passe)
+    public function __construct(string $nom, string $email, string $mot_de_passe)
     {
-        parent::__construct($nom_complet, $email, $mot_de_passe, 'guide');
+        parent::__construct($nom, $email, $mot_de_passe, 'guide', 'en_attente');
     }
-    public function approveGuide(Utilisateur $user): void
+
+    public function approuver(): void
     {
-        $user->setStatut('active');
+        $this->setStatut('active');
     }
 }

@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Classe;
+namespace App\Classes;
 
 class Admin extends Utilisateur
 {
-    public function __construct(string $nom_complet, string $email, string $mot_de_passe)
+    public function __construct(string $nom, string $email, string $mot_de_passe)
     {
-        parent::__construct($nom_complet, $email, $mot_de_passe, 'admin');
+        parent::__construct($nom, $email, $mot_de_passe, 'admin');
     }
-
 }
