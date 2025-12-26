@@ -1,5 +1,6 @@
 <?php
-session_start();
+
+namespace App\Classes;
 
 use App\Config\DataBase;
 use PDO;
@@ -13,7 +14,7 @@ class Auth
         $this->db = DataBase::getInstance()->getDataBase();
     }
 
-    public function login(array $data)
+    public function login(array $data): void
     {
         $stmt = $this->db->prepare(
             "SELECT * FROM utilisateurs WHERE email = :email"
@@ -26,10 +27,12 @@ class Auth
 
         if (!$user) {
             $this->setError("Aucun compte avec cet email");
+            return;
         }
 
         if (!password_verify($data['password'], $user['mot_de_passe'])) {
             $this->setError("Mot de passe incorrect");
+            return;
         }
 
         if ($user['statut_de_compet'] !== 'active') {
@@ -38,13 +41,14 @@ class Auth
                     ? "Compte bloqué"
                     : "Compte en attente d'activation"
             );
+            return;
         }
 
         $_SESSION['user'] = $user;
-        $this->redirection_par_role($user['role']);
+        $this->redirectionParRole($user['role']);
     }
 
-    public function register(array $data)
+    public function register(array $data): void
     {
         $erreurs = [];
 
@@ -56,7 +60,7 @@ class Auth
             $erreurs['password_error'] = "Mot de passe trop court";
         }
 
-        if ($this->email_deja_exists($data['email'])) {
+        if ($this->emailExiste($data['email'])) {
             $erreurs['email_existe'] = "Email déjà utilisé";
         }
 
@@ -87,17 +91,17 @@ class Auth
         exit();
     }
 
-    private function email_deja_exists(string $email): bool
+    private function emailExiste(string $email): bool
     {
         $stmt = $this->db->prepare(
             "SELECT id_utilisateur FROM utilisateurs WHERE email = :email"
         );
         $stmt->execute([':email' => $email]);
 
-        return $stmt->fetch() !== false;
+        return (bool) $stmt->fetch();
     }
 
-    private function redirection_par_role(string $role)
+    private function redirectionParRole(string $role): void
     {
         switch ($role) {
             case 'admin':
@@ -106,20 +110,31 @@ class Auth
             case 'guide':
                 header('Location: ../pages/guide/dashboard.php');
                 break;
-            case 'visiteur':
-                header('Location: ../pages/visiteur/dashboard.php');
-                break;
             default:
-                header('Location: ../pages/public/login.php');
+                header('Location: ../pages/visiteur/dashboard.php');
         }
         exit();
     }
 
-    private function setError(string $message)
+    private function setError(string $message): void
     {
         $_SESSION['login_error'] = $message;
         $_SESSION['form_active'] = 'login-form';
         header('Location: ../pages/public/login.php');
         exit();
     }
+
+    public function logout(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        session_unset();
+        session_destroy();
+
+        header('Location: ../index.php');
+        exit();
+    }
+
 }
