@@ -12,8 +12,8 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
-$guide_id = $_SESSION['user']['id_utilisateur'] ?? null;
-$reservations = Reservation::getAllreservations($connexion);
+$guide_id = $_SESSION['user']['id_utilisateur'];
+$reservations = Reservation::getAllreservations($connexion,$guide_id);
 
 require_once '../layouts/header.php';
 
