@@ -15,17 +15,17 @@ $connexion = Database::getInstance()->getDataBase();
 
 
 
-$total_users = $connexion->query("SELECT COUNT(*) total FROM utilisateurs")->fetch(PDO::FETCH_ASSOC)['total'];;
+$total_users = $connexion->query("SELECT COUNT(*) total FROM utilisateurs")->fetch(PDO::FETCH_ASSOC)['total'];
 
-$total_admin = $connexion->query("SELECT COUNT(*) total FROM utilisateurs WHERE role='admin'")->fetch(PDO::FETCH_ASSOC)['total'];;
+$total_admin = $connexion->query("SELECT COUNT(*) total FROM utilisateurs WHERE role='admin'")->fetch(PDO::FETCH_ASSOC)['total'];
 
-$total_guide = $connexion->query("SELECT COUNT(*) total FROM utilisateurs WHERE role='guide'")->fetch(PDO::FETCH_ASSOC)['total'];;
+$total_guide = $connexion->query("SELECT COUNT(*) total FROM utilisateurs WHERE role='guide'")->fetch(PDO::FETCH_ASSOC)['total'];
 
-$total_visiteur = $connexion->query("SELECT COUNT(*) total FROM utilisateurs WHERE role='visiteur'")->fetch(PDO::FETCH_ASSOC)['total'];;
+$total_visiteur = $connexion->query("SELECT COUNT(*) total FROM utilisateurs WHERE role='visiteur'")->fetch(PDO::FETCH_ASSOC)['total'];
 
-$total_animaux = $connexion->query("SELECT COUNT(*) total FROM animal")->fetch(PDO::FETCH_ASSOC)['total'];;
+$total_animaux = $connexion->query("SELECT COUNT(*) total FROM animal")->fetch(PDO::FETCH_ASSOC)['total'];
 
-$total_habitats = $connexion->query("SELECT COUNT(*) total FROM habitats")->fetch(PDO::FETCH_ASSOC)['total'];;
+$total_habitats = $connexion->query("SELECT COUNT(*) total FROM habitats")->fetch(PDO::FETCH_ASSOC)['total'];
 
 $animaux_alimentation = $connexion->query("
     SELECT alimentation, COUNT(*) total

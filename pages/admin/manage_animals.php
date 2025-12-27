@@ -1,20 +1,22 @@
 <?php
-
 session_start();
+require_once __DIR__ . '/../../autoload.php';
 
-use App\Config\DataBase;
-$connexion = DataBase::getInstance()->getDataBase();
+use App\Config\Database;
 
-if (!isset($_SESSION['user'])) {
-  header('Location: ../../pages/public/login.php');
-  exit();
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+    header('Location: ../public/login.php');
+    exit();
 }
 
+$connexion = Database::getInstance()->getDataBase();
 
 
 
-$habitats = $connexion->query("SELECT * FROM habitats ORDER BY id_habitat DESC");
-$aminaux = $connexion->query("SELECT * FROM animal ORDER BY id_animal DESC");
+
+
+$habitats = $connexion->query("SELECT * FROM habitats ORDER BY id_habitat DESC")->fetchAll(PDO::FETCH_ASSOC);
+$animaux = $connexion->query("SELECT * FROM animal ORDER BY id_animal DESC")->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 <!DOCTYPE html>
@@ -105,7 +107,7 @@ $aminaux = $connexion->query("SELECT * FROM animal ORDER BY id_animal DESC");
           </tr>
         </thead>
         <tbody>
-          <?php while ($animal = $aminaux->fetch_assoc()): ?>
+          <?php  foreach ($animaux as $animal): ?>
             <tr class="hover:bg-gray-100">
               <td class="px-4 py-2 border border-gray-300"><?= $animal['nom_animal']; ?></td>
               <td class="px-4 py-2 border border-gray-300"><?= $animal['espace']; ?></td>
@@ -126,7 +128,7 @@ $aminaux = $connexion->query("SELECT * FROM animal ORDER BY id_animal DESC");
                 </div>
               </td>
             </tr>
-          <?php endwhile; ?>
+          <?php endforeach; ?>
         </tbody>
       </table>
     </main>
