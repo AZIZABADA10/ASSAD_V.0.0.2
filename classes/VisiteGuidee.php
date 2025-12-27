@@ -118,12 +118,13 @@ class VisiteGuidee
         return $stmt->execute([$idVisite]);
     }
 
-    public static function getAllVisites(PDO $pdo): array
+    public static function getAllVisites(PDO $pdo, int $id_guide): array
     {
-        $sql = "SELECT * FROM visitesguidees";
+        $sql = "SELECT * FROM visitesguidees WHERE id_guide = ?";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute();
+        $stmt->execute([$id_guide]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
 }

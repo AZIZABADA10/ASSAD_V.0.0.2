@@ -14,7 +14,7 @@ $connexion = Database::getInstance()->getDataBase();
 
 $id_guide = $_SESSION['user']['id_utilisateur'];
 
-$visites = VisiteGuidee::getAllVisites($connexion);
+$visites = VisiteGuidee::getAllVisites($connexion,$id_guide);
 
 
 $zones = $connexion->query("
