@@ -11,6 +11,8 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 
 $connexion = Database::getInstance()->getDataBase();
 
+$habitats = $connexion->query("SELECT * FROM habitats")->fetchAll(PDO::FETCH_ASSOC);
+
 
 
 ?>
@@ -101,7 +103,7 @@ $connexion = Database::getInstance()->getDataBase();
           </tr>
         </thead>
         <tbody>
-          <?php while ($habitat = $habitats->fetch_assoc()): ?>
+          <?php foreach($habitats as $habitat): ?>
             <tr class="hover:bg-gray-100">
               <td class="px-4 py-2 border border-gray-300"><?= $habitat['id_habitat']; ?></td>
               <td class="px-4 py-2 border border-gray-300"><?= $habitat['nom_habitat']; ?></td>
@@ -119,7 +121,7 @@ $connexion = Database::getInstance()->getDataBase();
                   </a>
               </td>
             </tr>
-          <?php endwhile; ?>
+          <?php endforeach; ?>
         </tbody>
       </table>
 
