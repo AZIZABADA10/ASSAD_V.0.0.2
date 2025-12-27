@@ -1,6 +1,8 @@
-<?php
+ <?php
 session_start();
 use App\Config\DataBase;
+use App\Classes\VisiteGuidee;
+
 $connexion = DataBase::getInstance()->getDataBase();
 
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'guide') {
@@ -10,11 +12,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'guide') {
 
 $id_guide = $_SESSION['user']['id_utilisateur'];
 
-$visites = $connexion->query("
-    SELECT * FROM visitesguidees
-    WHERE id_guide = $id_guide
-    ORDER BY date_heure DESC
-");
+$visites = VisiteGuidee::getAllViste();
 
 
 $zones = $connexion->query("
@@ -48,7 +46,6 @@ $zones = $connexion->query("
   <?php require_once '../layouts/header.php'; ?>
 
 
-  <!-- ================= LAYOUT ================= -->
   <div class="flex pt-24">
 
     <aside class="fixed left-0 top-24 h-[calc(100vh-6rem)]  w-64 bg-dark text-white border-r border-white/10">
@@ -96,11 +93,10 @@ $zones = $connexion->query("
         </button>
       </div>
 
-      <!-- ================= TABLE ================= -->
       <table class="w-full border-collapse text-left">
         <thead class="bg-gray-200">
           <tr>
-            <th class="border px-4 py-2">Titre</th>
+            <th class="border px-4 py-2">Titnnnre</th>
             <th class="border px-4 py-2">Description</th>
             <th class="border px-4 py-2">Date</th>
             <th class="border px-4 py-2">Durée</th>
@@ -113,7 +109,7 @@ $zones = $connexion->query("
         </thead>
 
         <tbody>
-          <?php while ($visite = $visites->fetch_assoc()): ?>
+          <?php while ($visite = $visites): ?>
             <tr class="hover:bg-gray-100">
               <td class="border px-4 py-2"><?= htmlspecialchars($visite['description']) ?></td>
               <td class="border px-4 py-2"><?= htmlspecialchars($visite['titre']) ?></td>
@@ -270,4 +266,4 @@ $zones = $connexion->query("
 
 </body>
 
-</html>
+</html>  

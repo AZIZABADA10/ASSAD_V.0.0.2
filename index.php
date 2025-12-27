@@ -1,9 +1,19 @@
 <?php
-session_start();
-require_once 'config/db.php';
+require_once 'autoload.php';
+
+use App\Config\Database;
+
+$connexion = Database::getInstance()->getDataBase();
 
 
-$visites = $connexion->query("SELECT * FROM visitesguidees WHERE statut = 'ouverte' ORDER BY date_heure DESC LIMIT 3");
+$stmt = $connexion->prepare(
+    "SELECT * FROM visitesguidees 
+     WHERE statut = 'ouverte' 
+     ORDER BY date_heure DESC 
+     LIMIT 3"
+);
+$stmt->execute();
+$visites = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 $sql = "
@@ -16,8 +26,7 @@ $sql = "
 ";
 $stmt = $connexion->prepare($sql);
 $stmt->execute();
-$animaux = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-
+$animaux = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="fr">

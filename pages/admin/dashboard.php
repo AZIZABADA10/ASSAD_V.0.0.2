@@ -1,37 +1,31 @@
 <?php
-
 session_start();
 
-use App\Config\DataBase;
-$connexion = DataBase::getInstance()->getDataBase();
+require_once __DIR__ . '/../../autoload.php';
 
-if (!isset($_SESSION['user'])) {
-  header('Location: ../../pages/public/login.php');
-  exit();
+use App\Config\Database;
+
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+    header('Location: ../public/login.php');
+    exit();
 }
 
+$connexion = Database::getInstance()->getDataBase();
 
 
 
 
+$total_users = $connexion->query("SELECT COUNT(*) total FROM utilisateurs")->fetch(PDO::FETCH_ASSOC)['total'];;
 
-// Total utilisateurs
-$total_users = $connexion->query("SELECT COUNT(*) total FROM utilisateurs")->fetch_assoc()['total'];
+$total_admin = $connexion->query("SELECT COUNT(*) total FROM utilisateurs WHERE role='admin'")->fetch(PDO::FETCH_ASSOC)['total'];;
 
-// Admin
-$total_admin = $connexion->query("SELECT COUNT(*) total FROM utilisateurs WHERE role='admin'")->fetch_assoc()['total'];
+$total_guide = $connexion->query("SELECT COUNT(*) total FROM utilisateurs WHERE role='guide'")->fetch(PDO::FETCH_ASSOC)['total'];;
 
-// Guide
-$total_guide = $connexion->query("SELECT COUNT(*) total FROM utilisateurs WHERE role='guide'")->fetch_assoc()['total'];
+$total_visiteur = $connexion->query("SELECT COUNT(*) total FROM utilisateurs WHERE role='visiteur'")->fetch(PDO::FETCH_ASSOC)['total'];;
 
-// Visiteur
-$total_visiteur = $connexion->query("SELECT COUNT(*) total FROM utilisateurs WHERE role='visiteur'")->fetch_assoc()['total'];
+$total_animaux = $connexion->query("SELECT COUNT(*) total FROM animal")->fetch(PDO::FETCH_ASSOC)['total'];;
 
-// Total animaux
-$total_animaux = $connexion->query("SELECT COUNT(*) total FROM animal")->fetch_assoc()['total'];
-
-// Total habitats
-$total_habitats = $connexion->query("SELECT COUNT(*) total FROM habitats")->fetch_assoc()['total'];
+$total_habitats = $connexion->query("SELECT COUNT(*) total FROM habitats")->fetch(PDO::FETCH_ASSOC)['total'];;
 
 $animaux_alimentation = $connexion->query("
     SELECT alimentation, COUNT(*) total
@@ -178,23 +172,27 @@ $animaux_alimentation = $connexion->query("
       </h3>
 
       <?php
+      $rows = $animaux_alimentation->fetchAll(PDO::FETCH_ASSOC);
+
       $max = 0;
-      $animaux_alimentation->data_seek(0);
-      while ($row_tmp = $animaux_alimentation->fetch_assoc()) {
-        if ($row_tmp['total'] > $max)
-          $max = $row_tmp['total'];
+      foreach ($rows as $row_tmp) {
+          if ($row_tmp['total'] > $max) {
+              $max = $row_tmp['total'];
+          }
       }
-      $animaux_alimentation->data_seek(0);
+
+
       $colors = [
-        'Herbivore' => 'bg-green-500',
-        'Carnivore' => 'bg-red-500',
-        'Omnivore' => 'bg-yellow-500',
-        'Autre' => 'bg-purple-500'
+          'Herbivore' => 'bg-green-500',
+          'Carnivore' => 'bg-red-500',
+          'Omnivore'  => 'bg-yellow-500',
+          'Autre'     => 'bg-purple-500'
       ];
+
       ?>
 
       <div class="space-y-4">
-        <?php while ($row = $animaux_alimentation->fetch_assoc()): ?>
+        <?php foreach ($rows as $row): ?>
           <?php
           $type = ucfirst($row['alimentation']);
           $color = $colors[$type] ?? 'bg-gray-500';
@@ -209,7 +207,7 @@ $animaux_alimentation = $connexion->query("
               <span class="absolute right-2 top-0.5 text-white font-bold text-sm"><?= $row['total'] ?></span>
             </div>
           </div>
-        <?php endwhile; ?>
+        <?php endforeach; ?>
       </div>
 
 

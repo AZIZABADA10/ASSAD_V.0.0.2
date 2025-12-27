@@ -17,7 +17,7 @@ class EtapeVisite
         $this->idVisite = $idVisite;
     }
 
-    public function create(PDO $pdo): bool
+    public function createEtapeVisite(PDO $pdo): bool
     {
         $sql = "INSERT INTO etapesvisite 
         (titreetape, descriptionetape, ordreetape, id_visite)

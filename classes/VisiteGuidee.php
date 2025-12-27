@@ -117,4 +117,9 @@ class VisiteGuidee
         $stmt = $pdo->prepare($sql);
         return $stmt->execute([$idVisite]);
     }
+
+    public function getAllViste(){
+        $sql = "SELECT * FROM visitesguidees"; 
+        return $stmt->prepare($sql)->execute()->fetchAll();
+    }
 }
