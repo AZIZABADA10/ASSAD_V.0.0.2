@@ -3,6 +3,8 @@ session_start();
 require_once __DIR__ . '/../../autoload.php';
 
 use App\Config\Database;
+use App\Classes\Animal;
+use App\Classes\Habitat;
 
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header('Location: ../public/login.php');
@@ -10,13 +12,9 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 }
 
 $connexion = Database::getInstance()->getDataBase();
-
-
-
-
-
 $habitats = $connexion->query("SELECT * FROM habitats ORDER BY id_habitat DESC")->fetchAll(PDO::FETCH_ASSOC);
-$animaux = $connexion->query("SELECT * FROM animal ORDER BY id_animal DESC")->fetchAll(PDO::FETCH_ASSOC);
+$animaux = Animal::getAnimaux($connexion);
+
 
 ?>
 <!DOCTYPE html>
