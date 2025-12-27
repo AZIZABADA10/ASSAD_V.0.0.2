@@ -1,13 +1,15 @@
 <?php
-
 session_start();
-use App\Config\DataBase;
-$connexion = DataBase::getInstance()->getDataBase();
+require_once __DIR__ . '/../../autoload.php';
 
-if (!isset($_SESSION['user'])) {
-  header('Location: ../../pages/public/login.php');
-  exit();
+use App\Config\Database;
+
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+    header('Location: ../public/login.php');
+    exit();
 }
+
+$connexion = Database::getInstance()->getDataBase();
 
 
 

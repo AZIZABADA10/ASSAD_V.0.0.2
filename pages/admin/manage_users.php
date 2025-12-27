@@ -1,10 +1,17 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../autoload.php';
 
-use App\Config\DataBase;
-$connexion = DataBase::getInstance()->getDataBase();
+use App\Config\Database;
 
-$users = $connexion->query("SELECT * FROM utilisateurs order by id_utilisateur desc");
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+    header('Location: ../public/login.php');
+    exit();
+}
+
+$connexion = Database::getInstance()->getDataBase();
+
+$users = $connexion->query("SELECT * FROM utilisateurs order by id_utilisateur desc")->fetchAll(PDO::FETCH_ASSOC);
 
 
 $erreurs = [
@@ -123,7 +130,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
           </tr>
         </thead>
         <tbody>
-          <?php while ($user = $users->fetch_assoc()): ?>
+          <?php foreach($users as $user): ?>
             <tr class="hover:bg-gray-100">
               <td class="px-4 py-2 border border-gray-300"><?= $user['id_utilisateur']; ?></td>
               <td class="px-4 py-2 border border-gray-300"><?= $user['nom_complet']; ?></td>
@@ -158,7 +165,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
                 </div>
               </td>
             </tr>
-          <?php endwhile; ?>
+          <?php endforeach; ?>
         </tbody>
       </table>
     </main>
