@@ -1,11 +1,15 @@
 <?php
 
 session_start();
+require_once __DIR__ . '/../../autoload.php';
 
-if (!isset($_SESSION['user'])) {
-  header('Location: ../../pages/public/login.php');
-  exit();
+use App\Config\Database;
+
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'guide') {
+    header('Location: ../public/login.php');
+    exit();
 }
+
 
 ?>
 

@@ -1,14 +1,15 @@
- <?php
+<?php
 session_start();
-use App\Config\DataBase;
-use App\Classes\VisiteGuidee;
+require_once __DIR__ . '/../../autoload.php';
 
-$connexion = DataBase::getInstance()->getDataBase();
+use App\Config\Database;
 
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'guide') {
-    header('Location: ../../pages/public/login.php');
+    header('Location: ../public/login.php');
     exit();
 }
+
+$connexion = Database::getInstance()->getDataBase();
 
 $id_guide = $_SESSION['user']['id_utilisateur'];
 
@@ -20,7 +21,7 @@ $zones = $connexion->query("
     FROM habitats h
     JOIN animal a ON a.id_habitat = h.id_habitat
     ORDER BY h.zone_zoo ASC
-");
+")->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -109,7 +110,7 @@ $zones = $connexion->query("
         </thead>
 
         <tbody>
-          <?php while ($visite = $visites): ?>
+          <?php foreach($visites as $visite): ?>
             <tr class="hover:bg-gray-100">
               <td class="border px-4 py-2"><?= htmlspecialchars($visite['description']) ?></td>
               <td class="border px-4 py-2"><?= htmlspecialchars($visite['titre']) ?></td>
@@ -169,7 +170,7 @@ $zones = $connexion->query("
               </div>
             </td>
             </tr>
-          <?php endwhile; ?>
+          <?php endforeach; ?>
         </tbody>
       </table>
 
