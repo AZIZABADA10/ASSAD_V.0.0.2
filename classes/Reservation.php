@@ -1,6 +1,7 @@
 <?php
 namespace App\Classes;
 
+use PDO;
 
 class Reservation
 {
@@ -10,88 +11,116 @@ class Reservation
     private string $dateReservation;
     private string $statut;
 
-    public function __construct(int $idVisite,int $idUtilisateur,int $nbPersonnes,date $dateReservation,string $statut = 'en_attente')
+    public function __construct(int $idVisite,int $idUtilisateur,int $nbPersonnes,string $dateReservation,string $statut = 'en_attente')
     {
         $this->idVisite  = $idVisite;
-        $this->idutilisateur = $idUtilisateur;
-        $this->nbrPersonne = $nbPersonnes;
+        $this->idUtilisateur = $idUtilisateur;
+        $this->nbPersonnes = $nbPersonnes;
         $this->dateReservation = $dateReservation;
         $this->statut = $statut;
-
     }
 
-    
-    public function getIdVisite(): int
+    public function getIdVisite(): int 
     {
-        return $this->idVisite;
+        return $this->idVisite; 
     }
-    public function getIdutilisateur(): int
-    {
-        return $this->idutilisateur;
+    public function getIdUtilisateur(): int 
+    { 
+        return $this->idUtilisateur; 
     }
-    public function getNbrPersonne(): int
-    {
-        return $this->nbrPersonne;
+    public function getNbPersonnes(): int 
+    { 
+        return $this->nbPersonnes; 
     }
-    public function getDateReservation(): date
-    {
-        return $this->dateReservation;
+    public function getDateReservation(): string 
+    { 
+        return $this->dateReservation; 
     }
-    public function getStatut(): date
-    {
-        return $this->statut;
-    }
-
-
-    
-    public function setIdVisite(int $id): void
-    {
-        $this->idVisite = $id;
-    }
-    public function setIdutilisateur(int $id): void
-    {
-        $this->idutilisateur = $id;
-    }
-    public function setNbrPersonne(int $id): void
-    {
-        $this->nbrPersonne = $id;
-    }
-    public function setDateReservation(int $date):void
-    {
-        $this->dateReservation = $date;
-    }
-    public function setStatut(int $statut):void
-    {
-        $this->statut = $statut;
+    public function getStatut(): string 
+    { 
+        return $this->statut; 
     }
 
-    public function annulerStatut(int $id_reservation): void
-    {
-        $sql = "UPDATE reservations SET statut = 'annulee' where id_reservation =? ";
-        $pdo->prepare($sql)->execute([$id_reservation]);
+    public function setIdVisite(int $id): void 
+    { 
+        $this->idVisite = $id; 
     }
-    public function confiermerStatut(int $id_reservation): void
-    {
-        $sql = "UPDATE reservations SET statut = 'confirmee' where id_reservation =? ";
-        $pdo->prepare($sql)->execute([$id_reservation]);
+    public function setIdUtilisateur(int $id): void 
+    { 
+        $this->idUtilisateur = $id; 
+    }
+    public function setNbPersonnes(int $nb): void 
+    { 
+        $this->nbPersonnes = $nb; 
+    }
+    public function setDateReservation(string $date): void 
+    { 
+        $this->dateReservation = $date; 
+    }
+    public function setStatut(string $statut): void 
+    { 
+        $this->statut = $statut; 
     }
 
-    public function creer_reservation(int $id): void
+    public function annulerStatut(PDO $pdo, int $id_reservation): void
     {
-        $sql = "INSERT INTO reservations (
-        idVisite,idUtilisateur,nbPersonnes,dateReservation,statut
-        ) values (?,?,?,?,?)";
-        $pdo->prepare($sql)->execute([
-            $this->idVisite,         
-            $this->idutilisateur,
-            $this->nbrPersonne,           
-            $this->dateReservationn,
+        $sql = "UPDATE reservations SET statut = 'annulee' WHERE id_reservation = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$id_reservation]);
+    }
+
+    public function confirmerStatut(PDO $pdo, int $id_reservation): void
+    {
+        $sql = "UPDATE reservations SET statut = 'confirmee' WHERE id_reservation = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$id_reservation]);
+    }
+
+    public function creerReservation(PDO $pdo): void
+    {
+        $sql = "INSERT INTO reservations (id_visite,id_utilisateur,nb_personnes,date_reservation,statut)
+                VALUES (?, ?, ?, ?, ?)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            $this->idVisite,
+            $this->idUtilisateur,
+            $this->nbPersonnes,
+            $this->dateReservation,
             $this->statut
-          ]);
+        ]);
     }
-    public function getAllreservation()
+
+    public static function getAllReservations(PDO $pdo, ?int $idGuide = null): array
     {
-        $sql = "SELECT * FROM reservations";
-        return $pdo->prepare($sql)->fetchAll();
+        $sql = "
+            SELECT 
+                r.id_reservation,
+                r.statut,
+                r.nb_personnes,
+                r.date_reservation,
+                u.nom_complet AS visiteur,
+                v.titre AS visite
+            FROM reservations r
+            JOIN visitesguidees v ON r.id_visite = v.id_visite
+            JOIN utilisateurs u ON r.id_utilisateur = u.id_utilisateur
+        ";
+
+        if ($idGuide !== null) {
+            $sql .= " WHERE v.id_guide = :id_guide";
+        }
+
+        $sql .= " ORDER BY r.date_reservation DESC";
+
+        $stmt = $pdo->prepare($sql);
+
+        if ($idGuide !== null) {
+            $stmt->execute([':id_guide' => $idGuide]);
+        } else {
+            $stmt->execute();
+        }
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-}
+
+    }
+

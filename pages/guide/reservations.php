@@ -1,6 +1,10 @@
 <?php
+require_once __DIR__ . '/../../autoload.php';
+
 session_start();
 use App\Config\DataBase;
+use App\Classes\Reservation;
+
 $connexion = DataBase::getInstance()->getDataBase();
 
 if (!isset($_SESSION['user'])) {
@@ -9,27 +13,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 $guide_id = $_SESSION['user']['id_utilisateur'] ?? null;
-
-$sql = "
-SELECT 
-    r.id_reservation,
-    r.statut,
-    r.nb_personnes,
-    r.date_reservation,
-    u.nom_complet AS visiteur,
-    v.titre AS visite
-FROM reservations r
-JOIN visitesguidees v ON r.id_visite = v.id_visite
-JOIN utilisateurs u ON r.id_utilisateur = u.id_utilisateur
-WHERE v.id_guide = ?
-ORDER BY r.date_reservation DESC
-";
-$stmt = $connexion->prepare($sql);
-$stmt->bind_param("i", $guide_id);
-$stmt->execute();
-$reservations = $stmt->get_result();
-
-
+$reservations = Reservation::getAllreservations($connexion);
 
 require_once '../layouts/header.php';
 
@@ -88,7 +72,8 @@ require_once '../layouts/header.php';
     <i class='bxr  bx-arrow-out-right-square-half' style='color:#fa0d0d'></i> 
 
     <span>Logout</span>
-</button>    </div>
+</button>    
+</div>
   </header>
 
   <!-- Layout -->
@@ -138,7 +123,7 @@ require_once '../layouts/header.php';
 
     <?php
     //var_dump($reservations);
-     if ($reservations->num_rows > 0): ?>
+     if (!empty($reservations)): ?>
     <div class="overflow-x-auto">
         <table class="w-full border-collapse text-left">
             <thead class="bg-gray-200">
@@ -152,7 +137,7 @@ require_once '../layouts/header.php';
                 </tr>
             </thead>
             <tbody>
-                <?php while ($row = $reservations->fetch_assoc()): ?>
+                <?php foreach($reservations as $row): ?>
                 <tr class="hover:bg-gray-100">
                     <td class="border px-4 py-2"><?= htmlspecialchars($row['visite']) ?></td>
                     <td class="border px-4 py-2"><?= htmlspecialchars($row['visiteur']) ?></td>
@@ -183,7 +168,7 @@ require_once '../layouts/header.php';
                 </td>
 
                 </tr>
-                <?php  endwhile;  ?>
+                <?php endforeach; ?>
             </tbody>
         </table>
     </div>
