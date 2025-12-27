@@ -3,6 +3,7 @@ session_start();
 require_once __DIR__ . '/../../autoload.php';
 
 use App\Config\Database;
+use App\Classes\VisiteGuidee;
 
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'guide') {
     header('Location: ../public/login.php');
@@ -13,7 +14,7 @@ $connexion = Database::getInstance()->getDataBase();
 
 $id_guide = $_SESSION['user']['id_utilisateur'];
 
-$visites = VisiteGuidee::getAllViste();
+$visites = VisiteGuidee::getAllVisites($connexion);
 
 
 $zones = $connexion->query("
@@ -119,10 +120,8 @@ $zones = $connexion->query("
               <td class="border px-4 py-2"><?= $visite['prix'] ?> MAD</td>
               <td class="border px-4 py-2"><?= htmlspecialchars($visite['langue']) ?></td>
               <td class="border px-4 py-2"><?= $visite['capacite_max'] ?></td>
-
               <td class="border px-4 py-2">
                 <div class="flex items-center gap-2">
-
                   <span class="px-3 py-1 rounded-full text-sm
                     <?= $visite['statut'] == 'ouverte' ? 'bg-green-200 text-green-800' : '' ?>
                     <?= $visite['statut'] == 'annulee' ? 'bg-red-200 text-red-800' : '' ?>

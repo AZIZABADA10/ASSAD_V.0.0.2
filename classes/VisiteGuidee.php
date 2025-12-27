@@ -111,15 +111,19 @@ class VisiteGuidee
         return $stmt->execute([$nouveauStatut, $idVisite]);
     }
 
-    public static function annuler(PDO $pdo, int $idVisite): bool
+    public function annuler(PDO $pdo, int $idVisite): bool
     {
         $sql = "UPDATE visitesguidees SET statut='annulee' WHERE id_visite=?";
         $stmt = $pdo->prepare($sql);
         return $stmt->execute([$idVisite]);
     }
 
-    public function getAllViste(){
-        $sql = "SELECT * FROM visitesguidees"; 
-        return $stmt->prepare($sql)->execute()->fetchAll();
+    public static function getAllVisites(PDO $pdo): array
+    {
+        $sql = "SELECT * FROM visitesguidees";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 }
