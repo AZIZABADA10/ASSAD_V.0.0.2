@@ -1,44 +1,39 @@
 <?php
+require_once __DIR__ . '/../autoload.php';
 use App\Config\DataBase;
+use App\Classes\Habitat;
+
 $connexion = DataBase::getInstance()->getDataBase();
 
-$habitats = $connexion -> query("SELECT * FROM habitats ORDER BY id_habitat DESC");
-
-
 if (isset($_POST['ajouter_habitat'])) {
-    $nom_habitat = $_POST['nom_habitat'];
-    $type_climat = $_POST['type_climat'];
-    $zonezoo = $_POST['zonezoo'];
-    $description_habitat = $_POST['description_habitat'];
+    $habitat = new Habitat(
+        $_POST['nom_habitat'],
+        $_POST['type_climat'],
+        $_POST['description_habitat'],
+        $_POST['zonezoo']
+    );
 
-    $stmt = $connexion -> prepare("INSERT INTO habitats (nom_habitat,type_climat,zonezoo,description_habitat) VALUES (?,?,?,?)");
-    $stmt -> bind_param('ssss',$nom_habitat,$type_climat,$zonezoo,$description_habitat);
-    $stmt -> execute();
-    header('Location: ../pages/admin/manage_habitats.php');
-    exit();
+    if ($habitat->createHabitat($connexion)) {
+        header('Location: ../pages/admin/manage_habitats.php');
+        exit();
+    } else {
+        echo "Erreur lors de l'ajout de l'habitat.";
+    }
 }
 
 
-if (isset($_GET['supprimer'])) {
-    $id = intval($_GET['supprimer']);
 
-    // $check = $connexion->query("SELECT COUNT(*) AS total FROM animal WHERE id_habitat = $id");
-    // $row = $check->fetch_assoc();
+$id = $_GET['supprimer'] ?? null;
 
-    // if ($row['total'] > 0) {
-    //     header("Location: ../index.php?error=habitat_utilisé");
-    //     exit();
-    // }
-
-    $sql = "DELETE FROM habitats WHERE id_habitat = ?";
-    $stmt = $connexion->prepare($sql);
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-
-    header('Location: ../pages/admin/manage_habitats.php');
-    exit();
-
+if ($id) {
+    $habitat = Habitat::getHabitatById($connexion, (int)$id);
+    if ($habitat) {
+        $habitat->deleteHabitat($connexion);
+        header('Location: ../pages/admin/manage_habitats.php');
+        exit();
+    }
 }
+
 
 
 ?>
