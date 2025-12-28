@@ -10,7 +10,7 @@ Ce projet est une refonte complète d’une version précédente réalisée en P
 ## Fonctionnalités – User Stories
 
 ### Utilisateurs
-- 🔐 Inscription et connexion sécurisées avec rôle (Visiteur, Guide)
+- Inscription et connexion sécurisées avec rôle (Visiteur, Guide)
 - Gestion des comptes par l’administrateur (activation, désactivation, approbation des guides)
 
 ### Guides
