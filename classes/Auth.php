@@ -111,7 +111,7 @@ class Auth
                 header('Location: ../pages/guide/dashboard.php');
                 break;
             default:
-                header('Location: ../pages/visiteur/dashboard.php');
+                header('Location: ../pages/visitor/dashboard.php');
         }
         exit();
     }
