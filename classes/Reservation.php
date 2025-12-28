@@ -122,5 +122,27 @@ class Reservation
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
+    public static function dejaReserve(PDO $pdo, int $idVisite, int $idUtilisateur): bool
+    {
+        $stmt = $pdo->prepare(
+            "SELECT id_reservation FROM reservations 
+            WHERE id_visite = ? AND id_utilisateur = ?"
+        );
+        $stmt->execute([$idVisite, $idUtilisateur]);
+        return $stmt->rowCount() > 0;
     }
+
+    public static function reservationConfirmee(PDO $pdo,int $idVisite,int $idUtilisateur): bool 
+    {
+    $stmt = $pdo->prepare(
+        "SELECT 1 FROM reservations 
+         WHERE id_visite = ? AND id_utilisateur = ? AND statut = 'confirmee'"
+    );
+    $stmt->execute([$idVisite, $idUtilisateur]);
+    return (bool) $stmt->fetchColumn();
+}
+
+
+}
 
