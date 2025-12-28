@@ -10,19 +10,20 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'guide') {
     exit();
 }
 
-$connexion = Database::getInstance()->getDataBase();
+$pdo = Database::getInstance()->getDataBase();
 
 $id_guide = $_SESSION['user']['id_utilisateur'];
 
-$visites = VisiteGuidee::getAllVisites($connexion,$id_guide);
+$visites = VisiteGuidee::getAllVisites($pdo, $id_guide);
 
-
-$zones = $connexion->query("
+$stmtZones = $pdo->query("
     SELECT DISTINCT h.zone_zoo 
     FROM habitats h
     JOIN animal a ON a.id_habitat = h.id_habitat
     ORDER BY h.zone_zoo ASC
-")->fetchAll(PDO::FETCH_ASSOC);
+");
+$zones = $stmtZones->fetchAll(PDO::FETCH_ASSOC);
+?>
 
 ?>
 
@@ -48,6 +49,7 @@ $zones = $connexion->query("
   <?php require_once '../layouts/header.php'; ?>
 
 
+  <!-- ================= LAYOUT ================= -->
   <div class="flex pt-24">
 
     <aside class="fixed left-0 top-24 h-[calc(100vh-6rem)]  w-64 bg-dark text-white border-r border-white/10">
@@ -95,10 +97,11 @@ $zones = $connexion->query("
         </button>
       </div>
 
+      <!-- ================= TABLE ================= -->
       <table class="w-full border-collapse text-left">
         <thead class="bg-gray-200">
           <tr>
-            <th class="border px-4 py-2">Titnnnre</th>
+            <th class="border px-4 py-2">Titre</th>
             <th class="border px-4 py-2">Description</th>
             <th class="border px-4 py-2">Date</th>
             <th class="border px-4 py-2">Durée</th>
@@ -111,7 +114,7 @@ $zones = $connexion->query("
         </thead>
 
         <tbody>
-          <?php foreach($visites as $visite): ?>
+          <?php foreach ($visites as $visite): ?>
             <tr class="hover:bg-gray-100">
               <td class="border px-4 py-2"><?= htmlspecialchars($visite['description']) ?></td>
               <td class="border px-4 py-2"><?= htmlspecialchars($visite['titre']) ?></td>
@@ -120,8 +123,10 @@ $zones = $connexion->query("
               <td class="border px-4 py-2"><?= $visite['prix'] ?> MAD</td>
               <td class="border px-4 py-2"><?= htmlspecialchars($visite['langue']) ?></td>
               <td class="border px-4 py-2"><?= $visite['capacite_max'] ?></td>
+
               <td class="border px-4 py-2">
                 <div class="flex items-center gap-2">
+
                   <span class="px-3 py-1 rounded-full text-sm
                     <?= $visite['statut'] == 'ouverte' ? 'bg-green-200 text-green-800' : '' ?>
                     <?= $visite['statut'] == 'annulee' ? 'bg-red-200 text-red-800' : '' ?>
@@ -185,9 +190,9 @@ $zones = $connexion->query("
         <input type="text" name="titre" placeholder="Titre" required
           class="w-full px-4 py-2 rounded bg-transparent border">
 
-        <textarea name="description" required placeholder="Description de la visite (contenu, thèmes, animaux, etc.)"
-          class="w-full px-4 py-2 rounded bg-transparent border text-white placeholder-gray-400">
-        </textarea>
+        <textarea name="description" placeholder="Description de la visite" required
+          class="w-full px-4 py-2 rounded bg-transparent border text-white placeholder-gray-400"></textarea>
+
 
         <input type="date" name="date" required class="w-full px-4 py-2 rounded bg-transparent border">
         <input type="time" name="heure_debut" required class="w-full px-4 py-2 rounded bg-transparent border">
@@ -223,14 +228,12 @@ $zones = $connexion->query("
 
               <label for="zone_etape">Zone zoo</label>
               <select name="zone_etape" required class="w-full px-4 py-2 rounded bg-transparent border text-white">
-                  <option value="">Sélectionner une zone du zoo</option>
-                  <?php
-                  $zones->data_seek(0); 
-                  while($zone = $zones->fetch_assoc()):
-                  ?>
-                      <option value="<?= htmlspecialchars($zone['zone_zoo']); ?>"><?= htmlspecialchars($zone['zone_zoo']); ?></option>
-                  <?php endwhile; ?>
-              </select>
+                <option value="">Sélectionner une zone du zoo</option>
+                <?php foreach($zones as $zone): ?>
+                    <option value="<?= htmlspecialchars($zone['zone_zoo']); ?>"><?= htmlspecialchars($zone['zone_zoo']); ?></option>
+                <?php endforeach; ?>
+            </select>
+
 
               <input type="number" name="ordre_etape" placeholder="Ordre (1,2,3...)" required class="w-full px-4 py-2 rounded bg-transparent border">
               <button type="submit" name="ajouter_etape" class="w-full bg-blue-600 py-2 rounded font-semibold hover:bg-blue-700">Ajouter Étape</button>
@@ -266,4 +269,4 @@ $zones = $connexion->query("
 
 </body>
 
-</html>  
+</html>
