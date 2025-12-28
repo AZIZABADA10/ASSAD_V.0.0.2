@@ -1,6 +1,10 @@
 <?php
 session_start();
-require_once '../../config/db.php';
+require_once __DIR__ . '/../../autoload.php';
+
+use App\Config\DataBase;
+
+$connexion = DataBase::getInstance()->getDataBase();
 
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'visiteur') {
     header('Location: ../public/login.php');
@@ -21,14 +25,13 @@ ORDER BY r.date_reservation DESC
 ";
 
 $stmt = $connexion->prepare($sql);
-$stmt->bind_param("i", $id_visiteur);
-$stmt->execute();
-$reservations = $stmt->get_result();
+$stmt->execute([$id_visiteur]);
+$reservations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Récupérer les commentaires existants pour cette visite
+// Préparer la requête des commentaires
 $commentaires_stmt = $connexion->prepare("
     SELECT * FROM commentaires
-    WHERE id_utilisateur = ? AND id_visite = ?
+    WHERE id_utilisateur = :id_utilisateur AND id_visite = :id_visite
 ");
 ?>
 
@@ -48,7 +51,7 @@ $commentaires_stmt = $connexion->prepare("
 <main class="pt-32 max-w-6xl mx-auto px-6 mb-16">
 <h2 class="text-2xl font-bold mb-6 text-center">Mes Réservations</h2>
 
-<?php if ($reservations->num_rows > 0): ?>
+<?php if (count($reservations) > 0): ?>
 <div class="overflow-x-auto bg-white rounded-2xl shadow-lg">
   <table class="w-full text-sm text-left">
     <thead class="bg-gray-100 uppercase text-xs text-gray-600">
@@ -62,7 +65,7 @@ $commentaires_stmt = $connexion->prepare("
       </tr>
     </thead>
     <tbody class="divide-y">
-      <?php while ($row = $reservations->fetch_assoc()): ?>
+      <?php foreach ($reservations as $row): ?>
       <tr class="hover:bg-gray-50 transition">
         <td class="px-6 py-4 font-semibold"><?= htmlspecialchars($row['visite']) ?></td>
         <td class="px-6 py-4"><?= htmlspecialchars($row['guide']) ?></td>
@@ -79,17 +82,19 @@ $commentaires_stmt = $connexion->prepare("
         <td class="px-6 py-4">
           <?php if ($row['statut'] === 'confirmee'): ?>
             <?php 
-              $commentaires_stmt->bind_param("ii", $id_visiteur, $row['id_visite']);
-              $commentaires_stmt->execute();
-              $commentaires = $commentaires_stmt->get_result();
+              $commentaires_stmt->execute([
+                  ':id_utilisateur' => $id_visiteur,
+                  ':id_visite' => $row['id_visite']
+              ]);
+              $commentaires = $commentaires_stmt->fetchAll(PDO::FETCH_ASSOC);
             ?>
-            <?php if ($commentaires->num_rows > 0): ?>
-              <?php while ($c = $commentaires->fetch_assoc()): ?>
+            <?php if (count($commentaires) > 0): ?>
+              <?php foreach ($commentaires as $c): ?>
                 <div class="mb-2 p-2 bg-gray-100 rounded">
                   <?= str_repeat('⭐', $c['note']) ?> <br>
                   <?= htmlspecialchars($c['texte']) ?>
                 </div>
-              <?php endwhile; ?>
+              <?php endforeach; ?>
             <?php else: ?>
               <form action="../../actions/ajouter_commentaire.php" method="POST" class="flex flex-col gap-2">
                 <input type="hidden" name="id_visite" value="<?= $row['id_visite'] ?>">
@@ -108,7 +113,7 @@ $commentaires_stmt = $connexion->prepare("
           <?php endif; ?>
         </td>
       </tr>
-      <?php endwhile; ?>
+      <?php endforeach; ?>
     </tbody>
   </table>
 </div>
