@@ -1,8 +1,17 @@
 <?php
 session_start();
-
+require_once __DIR__ . '/../../autoload.php';
 use App\Config\DataBase;
-$connexion = DataBase::getInstance()->getDataBase();
+use App\Classes\VisiteGuidee;
+use App\Classes\Reservation;
+use App\Classes\Commentaire;
+
+
+
+
+
+
+
 
 if (!isset($_SESSION['user'])) {
     header('Location: ../../pages/public/login.php');
@@ -11,8 +20,9 @@ if (!isset($_SESSION['user'])) {
 
 $user_id = $_SESSION['user']['id_utilisateur'] ?? null;
 
-// Récupérer les visites ouvertes
-$visites = $connexion->query("SELECT * FROM visitesguidees WHERE statut = 'ouverte' ORDER BY date_heure DESC");
+$pdo = DataBase::getInstance()->getDataBase();
+$visites = VisiteGuidee::getVisitesOuvertes($pdo);
+
 
 require_once '../layouts/header.php';
 ?>
@@ -22,26 +32,16 @@ require_once '../layouts/header.php';
     <h1 class="text-4xl font-extrabold text-center mb-12">Visites Guidées</h1>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <?php while ($visite = $visites->fetch_assoc()): ?>
+        <?php foreach ($visites as $visite): ?>
 
             <?php
-            // Vérifier si l'utilisateur a déjà réservé cette visite
-            $stmt_check = $connexion->prepare("SELECT * FROM reservations WHERE id_visite = ? AND id_utilisateur = ?");
-            $stmt_check->bind_param("ii", $visite['id_visite'], $user_id);
-            $stmt_check->execute();
-            $already_reserved = $stmt_check->get_result()->num_rows > 0;
+                $already_reserved = Reservation::dejaReserve(
+                    $pdo,
+                    $visite['id_visite'],
+                    $user_id
+                );
 
-            // Récupérer les commentaires pour cette visite
-            $stmt_comments = $connexion->prepare("
-                SELECT c.texte, c.date_commentaire, u.nom_complet
-                FROM commentaires c
-                JOIN utilisateurs u ON c.id_utilisateur = u.id_utilisateur
-                WHERE c.id_visite = ?
-                ORDER BY c.date_commentaire DESC
-            ");
-            $stmt_comments->bind_param("i", $visite['id_visite']);
-            $stmt_comments->execute();
-            $commentaires = $stmt_comments->get_result();
+                 $commentaires = Commentaire::getByVisite($pdo,$visite['id_visite']);
             ?>
 
             <div
@@ -78,25 +78,25 @@ require_once '../layouts/header.php';
                     </a>
                 <?php endif; ?>
 
-                <?php if ($commentaires->num_rows > 0): ?>
+                <?php if (!empty($commentaires)): ?>
                     <button onclick="toggleComments(<?= $visite['id_visite'] ?>)"
                         class="mt-2 bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-600 transition">
                         Voir commentaires
                     </button>
 
                     <div id="comments-<?= $visite['id_visite'] ?>" class="mt-4 hidden bg-gray-50 p-4 rounded-lg max-h-48 overflow-y-auto">
-                        <?php while ($com = $commentaires->fetch_assoc()): ?>
+                        <?php foreach ($commentaires as $com): ?>
                             <div class="mb-3 border-b pb-2">
                                 <p class="text-sm font-semibold"><?= htmlspecialchars($com['nom_complet']) ?></p>
                                 <p class="text-sm text-gray-600"><?= htmlspecialchars($com['texte']) ?></p>
                                 <p class="text-xs text-gray-400"><?= date('d/m/Y H:i', strtotime($com['date_commentaire'])) ?></p>
                             </div>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
 
             </div>
-        <?php endwhile; ?>
+        <?php endforeach; ?>
     </div>
 </main>
 
