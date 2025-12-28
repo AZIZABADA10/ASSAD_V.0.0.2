@@ -1,7 +1,8 @@
 <?php
+session_start();
 require_once __DIR__ . '/../../autoload.php';
 
-session_start();
+
 use App\Config\DataBase;
 use App\Classes\Reservation;
 
