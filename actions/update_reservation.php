@@ -1,8 +1,8 @@
 <?php
 session_start();
-
-use App\Config\DataBase;
-$connexion = DataBase::getInstance()->getDataBase();
+require_once __DIR__ . '/../autoload.php';  
+use App\Config\Database; 
+$connexion = Database::getInstance()->getDataBase();
 
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'guide') {
     header('Location: ../pages/public/login.php');
@@ -14,8 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nouveau_statut = $_POST['statut'];
 
     $stmt = $connexion->prepare("UPDATE reservations SET statut = ? WHERE id_reservation = ?");
-    $stmt->bind_param("si", $nouveau_statut, $id_reservation);
-    $stmt->execute();
+    $stmt->execute([$nouveau_statut, $id_reservation]);
 
     header("Location: ../pages/guide/reservations.php");
     exit();
