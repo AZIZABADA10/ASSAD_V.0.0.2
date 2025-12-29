@@ -3,6 +3,7 @@ session_start();
 require_once __DIR__ . '/../../autoload.php';
 
 use App\Config\Database;
+use App\Classes\Utilisateur;
 
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header('Location: ../public/login.php');
@@ -11,7 +12,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 
 $connexion = Database::getInstance()->getDataBase();
 
-$users = $connexion->query("SELECT * FROM utilisateurs order by id_utilisateur desc")->fetchAll(PDO::FETCH_ASSOC);
+$users = Utilisateur::getAll($connexion);
 
 
 $erreurs = [
@@ -72,7 +73,6 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     <!-- Sidebar -->
     <aside class="fixed left-0 top-24 h-[calc(100vh-6rem)] w-64 bg-dark text-white border-r border-white/10">
       <div class="p-6">
-
         <a href="dashboard.php" class="flex items-center gap-3 px-4 py-3 rounded-xl
                     font-medium text-white/90
                     hover:bg-white/10 hover:text-accent
