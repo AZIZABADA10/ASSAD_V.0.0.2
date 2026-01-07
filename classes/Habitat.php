@@ -20,7 +20,6 @@ class Habitat
         $this->id = $id;
     }
 
-    // Getters
     public function getId(): ?int 
     { 
         return $this->id; 
