@@ -25,7 +25,6 @@ class Commentaire
         $this->dateCommentaire = $dateCommentaire;
     }
 
-    /* =================== CRUD =================== */
 
     public function creer(PDO $pdo): bool
     {
