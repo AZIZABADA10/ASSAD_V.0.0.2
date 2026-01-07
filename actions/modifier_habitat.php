@@ -24,7 +24,6 @@ if ($id) {
     }
 }
 
-// Traitement du formulaire de modification
 if (isset($_POST['modifier_habitat']) && $habitat) {
     $habitat->setNomHabitat($_POST['nom_habitat']);
     $habitat->setTypeClimat($_POST['type_climat']);
